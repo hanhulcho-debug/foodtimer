@@ -2,42 +2,43 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Korean Ramen Master Timer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Korean Ramen Master Timer 10</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap');
-        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
         .pulse-red { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .active-scale:active { transform: scale(0.95); transition: transform 0.1s; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen items-center p-4">
+<body class="flex flex-col min-h-screen items-center p-4 pb-10">
 
     <div id="app" class="w-full max-w-md flex flex-col items-center">
         <!-- Header Section -->
-        <header class="w-full mb-6">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-black flex items-center gap-2 tracking-tight text-slate-900">
-                    <i class="fa-solid fa-utensils text-red-600"></i> RAMEN AI
+        <header class="w-full mb-6 sticky top-0 bg-[#f8fafc]/80 backdrop-blur-md z-40 py-2">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-xl font-black flex items-center gap-2 tracking-tight text-slate-900">
+                    <i class="fa-solid fa-fire-burner text-red-600"></i> RAMEN MASTER 10
                 </h1>
                 <div class="flex items-center gap-2">
                     <div id="loadingIndicator" class="hidden flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 rounded-full animate-pulse border border-red-100">
                         <i class="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
-                        <span id="loadingText" class="text-[10px] font-black uppercase tracking-tighter">TTS...</span>
+                        <span id="loadingText" class="text-[10px] font-black uppercase tracking-tighter">AI VOICE...</span>
                     </div>
-                    <button onclick="toggleMute()" id="muteBtn" class="p-2 rounded-full border shadow-sm bg-white text-red-500 transition-all active:scale-90">
+                    <button onclick="toggleMute()" id="muteBtn" class="w-9 h-9 flex items-center justify-center rounded-full border shadow-sm bg-white text-red-500 active-scale transition-all">
                         <i class="fa-solid fa-volume-high" id="muteIcon"></i>
                     </button>
                     <div class="relative group">
-                        <button class="flex items-center gap-1 bg-white border px-3 py-1.5 rounded-full shadow-sm text-sm font-bold active:scale-95 transition-transform">
+                        <button class="flex items-center gap-1 bg-white border px-3 py-1.5 rounded-full shadow-sm text-sm font-bold active-scale transition-transform">
                             <i class="fa-solid fa-globe text-slate-400"></i> <span id="currentLangName">한국어</span>
                         </button>
-                        <div id="langMenu" class="absolute right-0 mt-2 w-32 bg-white border rounded-xl shadow-2xl z-50 hidden group-hover:block max-h-64 overflow-y-auto ring-1 ring-black/5 custom-scrollbar">
-                            <!-- Languages will be injected here -->
+                        <div id="langMenu" class="absolute right-0 mt-2 w-36 bg-white border rounded-xl shadow-2xl z-50 hidden group-hover:block max-h-64 overflow-y-auto ring-1 ring-black/5 custom-scrollbar">
+                            <!-- Languages injected by JS -->
                         </div>
                     </div>
                 </div>
@@ -49,59 +50,60 @@
                     <i class="fa-solid fa-fire"></i> <span id="gasText">가스레인지</span>
                 </button>
                 <button onclick="setHeat('induction')" id="inductionBtn" class="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500">
-                    <i class="fa-solid fa-droplet"></i> <span id="inductionText">인덕션</span>
+                    <i class="fa-solid fa-bolt"></i> <span id="inductionText">인덕션</span>
                 </button>
             </div>
         </header>
 
         <!-- Main Content -->
         <main id="mainContent" class="w-full">
-            <!-- Ramen Grid (Initial View) -->
-            <div id="ramenGrid" class="grid grid-cols-2 gap-3">
-                <!-- Ramen cards will be injected here -->
+            <!-- Ramen Grid (10 Items) -->
+            <div id="ramenGrid" class="grid grid-cols-2 gap-3 mb-6">
+                <!-- Ramen cards injected by JS -->
             </div>
 
-            <!-- Timer/Prep View (Hidden by default) -->
-            <div id="timerView" class="hidden bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-50 text-center relative overflow-hidden transition-all duration-300">
+            <!-- Timer/Prep View -->
+            <div id="timerView" class="hidden bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-2xl border border-slate-50 text-center relative overflow-hidden transition-all duration-300">
                 <div id="speakingBar" class="hidden absolute top-0 left-0 w-full h-1.5 bg-red-600 animate-pulse"></div>
                 
                 <div id="ramenBadge" class="inline-block px-4 py-1.5 rounded-full text-xs font-black text-white mb-6 shadow-md bg-red-600">
-                    신라면
+                    라면 이름
                 </div>
 
-                <!-- Prep Step -->
-                <div id="prepArea" class="py-4">
+                <!-- Prep Area (Voice Guidance Priority) -->
+                <div id="prepArea" class="py-2">
                     <div class="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-red-100">
-                        <i class="fa-solid fa-check-double text-3xl animate-bounce"></i>
+                        <i class="fa-solid fa-clipboard-list text-3xl animate-bounce"></i>
                     </div>
-                    <h2 id="prepTitle" class="text-3xl font-black mb-4 tracking-tight">준비되셨나요?</h2>
-                    <div class="bg-slate-50 p-6 rounded-[2rem] mb-8 border border-slate-100 shadow-inner">
-                        <p id="prepDesc" class="text-slate-700 font-bold leading-relaxed text-lg">
+                    <h2 id="prepTitle" class="text-2xl font-black mb-4 tracking-tight">준비되셨나요?</h2>
+                    <div class="bg-slate-50 p-5 rounded-[2rem] mb-8 border border-slate-100 shadow-inner">
+                        <p id="prepDesc" class="text-slate-700 font-bold leading-relaxed text-base sm:text-lg">
                             물을 냄비에 붓고 시작 버튼을 눌러주세요.
                         </p>
                     </div>
-                    <button id="startActionBtn" onclick="onStartAction()" class="w-full py-5 bg-red-600 text-white rounded-[1.5rem] font-black text-xl shadow-xl hover:bg-red-700 transition active:scale-95 flex items-center justify-center gap-3">
+                    <button id="startActionBtn" onclick="onStartAction()" class="w-full py-5 bg-red-600 text-white rounded-[1.5rem] font-black text-xl shadow-xl hover:bg-red-700 active-scale flex items-center justify-center gap-3">
                         <i class="fa-solid fa-play"></i> <span id="actionBtnText">시작</span>
                     </button>
+                    <button onclick="resetApp()" class="mt-4 text-slate-400 font-bold text-sm hover:underline">목록으로 돌아가기</button>
                 </div>
 
-                <!-- Active Timer -->
-                <div id="activeTimerArea" class="hidden animate-in fade-in duration-500">
+                <!-- Active Timer Area -->
+                <div id="activeTimerArea" class="hidden">
                     <div class="flex items-center justify-center gap-2 text-slate-400 mb-2 font-bold uppercase text-[10px] tracking-widest">
-                        <i class="fa-solid fa-faucet-drip text-blue-500"></i> <span id="waterGuideDisplay">550ml</span> <span id="waterTextLabel">물 양</span>
+                        <i class="fa-solid fa-droplet text-blue-500"></i> <span id="waterGuideDisplay">550ml</span> <span id="waterTextLabel">물 양</span>
                     </div>
-                    <div id="timerDisplay" class="text-7xl font-mono font-black my-8 tracking-tighter text-slate-200 transition-colors">
+                    <div id="timerDisplay" class="text-7xl font-mono font-black my-6 tracking-tighter text-slate-200 transition-colors">
                         0:00
                     </div>
-                    <div class="mb-10 min-h-[100px] flex flex-col justify-center">
+                    <div class="mb-8 min-h-[90px] flex flex-col justify-center">
                         <h2 id="phaseTitle" class="text-2xl font-black mb-3 tracking-tight text-blue-500">물 끓이기</h2>
-                        <p id="phaseDesc" class="text-slate-500 font-bold text-lg px-2 leading-tight">물을 냄비에 붓고 가열하세요.</p>
+                        <p id="phaseDesc" class="text-slate-500 font-bold text-base sm:text-lg px-2 leading-tight">물을 냄비에 붓고 가열하세요.</p>
                     </div>
                     <div class="flex gap-4">
-                        <button onclick="resetApp()" class="flex-1 py-5 bg-slate-100 rounded-[1.5rem] font-black text-slate-600 flex items-center justify-center gap-2 hover:bg-slate-200 transition active:scale-95">
-                            <i class="fa-solid fa-rotate-right"></i>
+                        <button onclick="resetApp()" class="flex-1 py-5 bg-slate-100 rounded-[1.5rem] font-black text-slate-600 flex items-center justify-center gap-2 hover:bg-slate-200 active-scale">
+                            <i class="fa-solid fa-list"></i>
                         </button>
-                        <button id="pauseBtn" onclick="togglePause()" class="flex-[3] py-5 rounded-[1.5rem] font-black text-white shadow-xl flex items-center justify-center gap-3 transition active:scale-95 bg-red-600 hover:bg-red-700">
+                        <button id="pauseBtn" onclick="togglePause()" class="flex-[3] py-5 rounded-[1.5rem] font-black text-white shadow-xl flex items-center justify-center gap-3 active-scale bg-red-600 hover:bg-red-700">
                             <i class="fa-solid fa-pause" id="pauseIcon"></i> <span id="pauseText">PAUSE</span>
                         </button>
                     </div>
@@ -109,68 +111,71 @@
             </div>
         </main>
 
-        <footer class="mt-auto py-10 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] text-center w-full">
-            Global Ramen Intelligence • AI Voice Engine v3
+        <footer class="mt-8 py-4 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] text-center w-full">
+            The 10 Masters of Korean Ramen • AI Guided
         </footer>
     </div>
 
     <script>
-        // --- Configuration & Data ---
-        const apiKey = ""; // Empty as per environment requirements
+        const apiKey = "";
         const RAMEN_LIST = [
             { id: 1, name: '신라면', eng: 'Shin Ramyun', water: 550, cookTime: 270, type: 'soup', color: 'bg-red-600' },
             { id: 2, name: '진라면', eng: 'Jin Ramyun', water: 550, cookTime: 240, type: 'soup', color: 'bg-blue-600' },
-            { id: 3, name: '짜파게티', eng: 'Chapagetti', water: 600, cookTime: 300, type: 'drain', color: 'bg-yellow-800' },
+            { id: 3, name: '짜파게티', eng: 'Chapagetti', water: 600, cookTime: 300, type: 'drain', color: 'bg-[#4a3728]' },
             { id: 4, name: '불닭볶음면', eng: 'Buldak', water: 600, cookTime: 300, type: 'drain', color: 'bg-black' },
-            { id: 5, name: '너구리', eng: 'Neoguri', water: 550, cookTime: 300, type: 'soup', color: 'bg-orange-700' },
+            { id: 5, name: '너구리', eng: 'Neoguri', water: 550, cookTime: 300, type: 'soup', color: 'bg-orange-800' },
             { id: 6, name: '안성탕면', eng: 'Ansung', water: 550, cookTime: 270, type: 'soup', color: 'bg-orange-500' },
             { id: 7, name: '삼양라면', eng: 'Samyang', water: 550, cookTime: 240, type: 'soup', color: 'bg-orange-600' },
-            { id: 8, name: '비빔면', eng: 'Bibimmyeon', water: 600, cookTime: 180, type: 'cold', color: 'bg-blue-500' },
+            { id: 8, name: '팔도비빔면', eng: 'Bibimmyeon', water: 600, cookTime: 180, type: 'cold', color: 'bg-blue-500' },
             { id: 9, name: '진짬뽕', eng: 'Jinjjamppong', water: 550, cookTime: 300, type: 'soup', color: 'bg-red-700' },
+            { id: 10, name: '참깨라면', eng: 'Sesame Ramen', water: 500, cookTime: 240, type: 'soup', color: 'bg-yellow-600' },
         ];
 
         const LANGUAGES = {
-            ko: { name: '한국어', voice: 'Kore', start: '시작', water: '물 양', boil: '물 끓이기', cook: '조리하기', gas: '가스레인지', induction: '인덕션', finish: '맛있게 드세요!', prep1: '을 선택했습니다. 냄비에 물을 붓고 시작을 눌러주세요.', prep2: '물이 끓었습니다. 면과 스프를 넣고 시작을 눌러주세요.', step1: '물을 냄비에 붓고 가열하세요.', step2: '면과 스프를 넣고 조리하세요.', step3: '면을 건져 소스와 비비세요.', step4: '찬물에 헹군 뒤 소스와 비비세요.', ready: '준비되셨나요?', loading: '음성 생성 중...' },
-            en: { name: 'English', voice: 'Zephyr', start: 'Start', water: 'Water', boil: 'Boiling', cook: 'Cooking', gas: 'Gas Stove', induction: 'Induction', finish: 'Enjoy your meal!', prep1: 'selected. Pour water and press Start.', prep2: 'Water is boiling. Add noodles and press Start.', step1: 'Pour water and boil.', step2: 'Add noodles and soup.', step3: 'Drain and mix sauce.', step4: 'Rinse in cold water.', ready: 'Ready?', loading: 'Generating...' },
-            ja: { name: '日本語', voice: 'Aoede', start: '開始', water: '水の量', boil: '湯沸かし', cook: '調理', gas: 'ガス', induction: 'IH', finish: '召し上がれ！', prep1: 'を選択しました。水を入れて開始を押してください。', prep2: 'お湯が沸きました。麺とスープを入れて開始を押してください。', step1: '水を入れ沸騰させます。', step2: '麺とスープを入れ調理。', step3: '湯を捨てソースを混ぜ。', step4: '冷水で締めソースを混ぜ。', ready: '準備完了', loading: '音声を生成中...' },
-            zh: { name: '中文', voice: 'Callirrhoe', start: '开始', water: '水量', boil: '烧水', cook: '煮面', gas: '燃气灶', induction: '电磁炉', finish: '请享용！', prep1: '已选择。请加水并点击开始。', prep2: '水开了。放入面条和调料包，然后点击开始。', step1: '加水并烧开。', step2: '放入面条和调料包。', step3: '倒掉水并拌入酱料。', step4: '用凉水冲洗并拌入酱料。', ready: '准备就绪', loading: '正在生成声音...' },
-            vi: { name: 'Tiếng Việt', voice: 'Leda', start: 'Bắt đầu', water: 'Lượng nước', boil: 'Đang sôi', cook: 'Nấu ăn', gas: 'Bếp gas', induction: 'Bếp từ', finish: 'Chúc ngon miệng!', prep1: 'đã chọn. Đổ nước vào nồi và nhấn Bắt đầu.', prep2: 'Nước đã sôi. Thêm mì và gia vị, sau đó nhấn Bắt đầu.', step1: 'Đổ nước 및 đun sôi.', step2: 'Thêm mì 및 gia vị.', step3: 'Chắt nước 및 trộn sốt.', step4: 'Rửa bằng nước lạnh.', ready: 'Sẵn sàng', loading: 'Đang tạo...' },
-            th: { name: 'ไทย', voice: 'Orus', start: 'เริ่ม', water: 'ปริมาณน้ำ', boil: 'ต้มน้ำ', cook: 'ปรุงอาหาร', gas: 'เตาแก๊ส', induction: 'เตาแม่เหล็กไฟฟ้า', finish: 'ขอให้ทานให้อร่อย!', prep1: 'เลือกแล้ว กรุณาใส่น้ำและกดเริ่ม', prep2: 'น้ำเดือดแล้ว ใส่เส้นและเครื่องปรุงแล้วกดเริ่ม', step1: 'ใส่น้ำ하고 ต้มให้เดือด', step2: 'ใส่เส้นและเครื่องปรุง', step3: 'เทน้ำออก하고 ผสมซอส', step4: 'ล้างด้วยน้ำเย็นและผสมซอส', ready: 'พร้อมแล้ว', loading: 'กำลังสร้างเสียง...' },
+            ko: { name: '한국어', voice: 'Kore', start: '시작', water: '물 양', boil: '물 끓이기', cook: '조리하기', gas: '가스레인지', induction: '인덕션', finish: '맛있게 드세요!', prep1: '을 선택했습니다. 냄비에 물을 붓고 시작을 눌러주세요.', prep2: '물이 끓었습니다. 면과 스프를 넣고 시작을 눌러주세요.', step1: '물을 냄비에 붓고 가열하세요.', step2: '면과 스프를 넣고 조리하세요.', step3: '면을 건져 소스와 비비세요.', step4: '찬물에 헹군 뒤 소스와 비비세요.', ready: '준비되셨나요?', loading: '안내 생성 중...' },
+            en: { name: 'English', voice: 'Zephyr', start: 'Start', water: 'Water', boil: 'Boiling', cook: 'Cooking', gas: 'Gas Stove', induction: 'Induction', finish: 'Enjoy your meal!', prep1: 'selected. Pour water and press Start.', prep2: 'Water is boiling. Add noodles and press Start.', step1: 'Pour water and boil.', step2: 'Add noodles and soup.', step3: 'Drain and mix sauce.', step4: 'Rinse in cold water.', ready: 'Ready?', loading: 'Generating Voice...' },
+            ja: { name: '日本語', voice: 'Aoede', start: '開始', water: '水の量', boil: '湯沸かし', cook: '調理', gas: 'ガス', induction: 'IH', finish: '召し上がれ！', prep1: 'を選択しました。水を入れて開始を押してください。', prep2: 'お湯가 끓었습니다. 면과 스프를 넣고 시작을 눌러주세요.', step1: '물을 넣어 끓입니다.', step2: '면과 스프를 넣어 조리합니다.', step3: '탕을 버리고 소스를 섞어줍니다.', step4: '찬물에 헹궈 소스를 섞어줍니다.', ready: '準備完了', loading: '音声を生成中...' },
+            zh: { name: '中文', voice: 'Callirrhoe', start: '开始', water: '水量', boil: '烧水', cook: '煮面', gas: '燃气灶', induction: '电磁炉', finish: '请享用！', prep1: '已选择。请加水并点击开始。', prep2: '水开了。放入面条和调料包，然后点击开始。', step1: '加水并烧开。', step2: '放入面条和调料包。', step3: '倒掉水并拌入酱料。', step4: '用凉水冲洗并拌入酱料。', ready: '准备就绪', loading: '正在生成声音...' },
+            vi: { name: 'Tiếng Việt', voice: 'Leda', start: 'Bắt đầu', water: 'Lượng nước', boil: 'Đang sôi', cook: 'Nấu ăn', gas: 'Bếp gas', induction: 'Bếp từ', finish: 'Chúc ngon miệng!', prep1: 'đã chọn. Đổ nước vào nồi và nhấn Bắt đầu.', prep2: 'Nước đã sôi. Thêm mì và gia vị, sau đó nhấn Bắt đầu.', step1: 'Đổ nước và đun sôi.', step2: 'Thêm mì và gia vị.', step3: 'Chắt nước và trộn sốt.', step4: 'Rửa bằng nước lạnh.', ready: 'Sẵn sàng', loading: 'Đang tạo...' },
+            th: { name: 'ไทย', voice: 'Orus', start: 'เริ่ม', water: 'ปริมาณน้ำ', boil: 'ต้มน้ำ', cook: 'ปรุงอาหาร', gas: 'เตาแก๊ส', induction: 'เตาแม่เหล็กไฟฟ้า', finish: 'ขอให้สนุกกับการกิน!', prep1: 'เลือกแล้ว กรุณาใส่น้ำ하고กดเริ่ม', prep2: 'น้ำเดือดแล้ว ใส่เส้นและเครื่องปรุงแล้วกดเริ่ม', step1: 'ใส่น้ำ하고 ต้มให้เดือด', step2: 'ใส่เส้นและเครื่องปรุง', step3: 'เทน้ำออกและผสมซอส', step4: 'ล้างด้วยน้ำเย็นและผสมซอส', ready: 'พร้อมแล้ว', loading: 'กำลังสร้างเสียง...' },
             id: { name: 'Bahasa Indonesia', voice: 'Fenrir', start: 'Mulai', water: 'Air', boil: 'Merebus', cook: 'Memasak', gas: 'Kompor Gas', induction: 'Induksi', finish: 'Selamat makan!', prep1: 'dipilih. Tuangkan air dan tekan Mulai.', prep2: 'Air sudah mendidih. Masukkan mi dan bumbu, lalu tekan Mulai.', step1: 'Tuang air dan rebus.', step2: 'Masukkan mi dan bumbu.', step3: 'Tiriskan 및 campur saus.', step4: 'Bilas air dingin.', ready: 'Siap', loading: 'Menghasilkan...' },
             es: { name: 'Español', voice: 'Despina', start: 'Iniciar', water: 'Agua', boil: 'Hirviendo', cook: 'Cocinando', gas: 'Gas', induction: 'Inducción', finish: '¡Buen provecho!', prep1: 'seleccionado. Vierte agua y presiona Iniciar.', prep2: 'El agua está hirviendo. Agrega fideos 및 presiona Iniciar.', step1: 'Vierte agua 및 hierve.', step2: 'Agrega fideos 및 condimento.', step3: 'Escurre 및 mezcla la salsa.', step4: 'Enjuaga 및 mezcla.', ready: 'Listo', loading: 'Generando...' },
             fr: { name: 'Français', voice: 'Charon', start: 'Démarrer', water: 'Eau', boil: 'Ébullition', cook: 'Cuisiner', gas: 'Gaz', induction: 'Induction', finish: 'Bon appétit !', prep1: 'sélectionné. Versez l\'eau et appuyez sur Démarrer.', prep2: 'L\'eau bout. Ajoutez les nouilles 및 appuyez sur Démarrer.', step1: 'Verser l\'eau 및 bouillir.', step2: 'Ajouter nouilles 및 soupe.', step3: 'Égoutter 및 mélanger.', step4: 'Rincer à l\'eau froide.', ready: 'Prêt', loading: 'Génération...' },
             de: { name: 'Deutsch', voice: 'Puck', start: 'Start', water: 'Wasser', boil: 'Kochen', cook: 'Zubereiten', gas: 'Gasherd', induction: 'Induktion', finish: 'Guten Appetit!', prep1: 'ausgewählt. Wasser einfüllen 및 Start drücken.', prep2: 'Wasser kocht. Nudeln hinzufügen 및 Start drücken.', step1: 'Wasser einfüllen 및 kochen.', step2: 'Nudeln 및 Suppe hinzufügen.', step3: 'Wasser abgießen.', step4: 'Kalt abspülen.', ready: 'Bereit', loading: 'Stimme...' }
         };
 
-        // --- App State ---
         let currentLang = 'ko';
         let heatSource = 'gas';
         let selectedRamen = null;
-        let phase = 'selection'; // selection, prep-boil, boiling, prep-cook, cooking, finished
+        let phase = 'selection'; 
         let timeLeft = 0;
         let timerActive = false;
         let isMuted = false;
         let isSpeaking = false;
         let timerInterval = null;
 
-        // --- Core Functions ---
-
         function init() {
             renderRamenGrid();
             renderLangMenu();
             updateUIStrings();
+            
+            // Audio Context Unlocking for Mobile
+            document.body.addEventListener('click', function unlock() {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                context.resume();
+                document.body.removeEventListener('click', unlock);
+            }, { once: true });
         }
 
         function renderRamenGrid() {
             const grid = document.getElementById('ramenGrid');
             grid.innerHTML = RAMEN_LIST.map(ramen => `
-                <button onclick="handleSelectRamen(${ramen.id})" class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 hover:border-red-200 transition-all hover:-translate-y-1 active:scale-95 group text-left">
-                    <div class="w-12 h-12 rounded-2xl mb-3 flex items-center justify-center text-white shadow-lg ${ramen.color} group-hover:scale-110 transition">
-                        <i class="fa-solid fa-bowl-food text-xl"></i>
+                <button onclick="handleSelectRamen(${ramen.id})" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 hover:border-red-200 transition-all active:scale-95 group text-left">
+                    <div class="w-10 h-10 rounded-2xl mb-3 flex items-center justify-center text-white shadow-lg ${ramen.color} group-hover:scale-110 transition">
+                        <i class="fa-solid fa-utensils text-sm"></i>
                     </div>
-                    <h3 class="font-bold text-sm text-slate-900">${ramen.name}</h3>
-                    <p class="text-[10px] text-slate-400 font-medium mb-3">${ramen.eng}</p>
-                    <div class="flex justify-between w-full text-[10px] font-bold text-slate-500 bg-slate-50 p-2 rounded-xl">
+                    <h3 class="font-bold text-[13px] text-slate-900 leading-tight h-8 flex items-center">${ramen.name}</h3>
+                    <div class="flex justify-between w-full text-[10px] font-bold text-slate-500 bg-slate-50 p-1.5 rounded-xl mt-1">
                         <span><i class="fa-solid fa-droplet text-blue-400 mr-1"></i>${ramen.water}ml</span>
                         <span><i class="fa-solid fa-clock text-slate-300 mr-1"></i>${ramen.cookTime/60}m</span>
                     </div>
@@ -181,7 +186,7 @@
         function renderLangMenu() {
             const menu = document.getElementById('langMenu');
             menu.innerHTML = Object.keys(LANGUAGES).map(key => `
-                <button onclick="setLang('${key}')" class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 ${currentLang === key ? 'text-red-600 font-black' : 'text-slate-600'}">
+                <button onclick="setLang('${key}')" class="w-full text-left px-4 py-3 text-xs border-b border-slate-50 last:border-0 active:bg-slate-50 ${currentLang === key ? 'text-red-600 font-black' : 'text-slate-600'}">
                     ${LANGUAGES[key].name}
                 </button>
             `).join('');
@@ -192,9 +197,7 @@
             document.getElementById('currentLangName').innerText = LANGUAGES[key].name;
             updateUIStrings();
             renderLangMenu();
-            if (phase !== 'selection') {
-                updateTimerUI(); // Update description in current lang
-            }
+            if (phase !== 'selection') updateTimerUI();
         }
 
         function updateUIStrings() {
@@ -223,10 +226,8 @@
         function toggleMute() {
             isMuted = !isMuted;
             document.getElementById('muteIcon').className = isMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
-            document.getElementById('muteBtn').className = isMuted ? 'p-2 rounded-full border shadow-sm bg-slate-200 text-slate-500' : 'p-2 rounded-full border shadow-sm bg-white text-red-500';
+            document.getElementById('muteBtn').className = isMuted ? 'w-9 h-9 flex items-center justify-center rounded-full border shadow-sm bg-slate-200 text-slate-500 active-scale transition-all' : 'w-9 h-9 flex items-center justify-center rounded-full border shadow-sm bg-white text-red-500 active-scale transition-all';
         }
-
-        // --- Voice Logic ---
 
         async function speak(text, retry = 0) {
             if (isMuted || !text) return;
@@ -243,15 +244,13 @@
                         generationConfig: {
                             responseModalities: ["AUDIO"],
                             speechConfig: {
-                                voiceConfig: {
-                                    prebuiltVoiceConfig: { voiceName: LANGUAGES[currentLang].voice }
-                                }
+                                voiceConfig: { prebuiltVoiceConfig: { voiceName: LANGUAGES[currentLang].voice } }
                             }
                         }
                     })
                 });
 
-                if (!response.ok) throw new Error("TTS API Error");
+                if (!response.ok) throw new Error("TTS Failed");
                 const result = await response.json();
                 const audioData = result.candidates?.[0]?.content?.parts?.[0]?.inlineData;
 
@@ -261,12 +260,8 @@
                 } else throw new Error("No Audio Data");
 
             } catch (err) {
-                console.error(err);
-                if (retry < 3) {
-                    setTimeout(() => speak(text, retry + 1), 1000 * Math.pow(2, retry));
-                } else {
-                    stopSpeakingUI();
-                }
+                if (retry < 2) setTimeout(() => speak(text, retry + 1), 1000);
+                else stopSpeakingUI();
             }
         }
 
@@ -293,11 +288,9 @@
             
             const blob = new Blob([wavHeader, bytes], { type: 'audio/wav' });
             const audio = new Audio(URL.createObjectURL(blob));
-            audio.play().catch(e => console.warn("Auto-play blocked", e));
+            audio.play().catch(() => {});
             audio.onended = stopSpeakingUI;
         }
-
-        // --- Workflow Logic ---
 
         function handleSelectRamen(id) {
             selectedRamen = RAMEN_LIST.find(r => r.id === id);
@@ -315,6 +308,7 @@
             document.getElementById('prepDesc').innerText = `${selectedRamen.name}. ${t.water} ${selectedRamen.water}ml. ${t.step1}`;
             
             speak(`${selectedRamen.name}. ${t.water} ${selectedRamen.water}ml. ${t.prep1}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function onStartAction() {
@@ -333,18 +327,14 @@
             timerActive = true;
             document.getElementById('prepArea').classList.add('hidden');
             document.getElementById('activeTimerArea').classList.remove('hidden');
-            
             updateTimerUI();
             
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 if (timerActive) {
                     timeLeft--;
-                    if (timeLeft <= 0) {
-                        onTimerComplete();
-                    } else {
-                        updateTimerDisplay();
-                    }
+                    if (timeLeft <= 0) onTimerComplete();
+                    else updateTimerDisplay();
                 }
             }, 1000);
         }
@@ -357,7 +347,6 @@
                 phase = 'prep-cook';
                 document.getElementById('prepArea').classList.remove('hidden');
                 document.getElementById('activeTimerArea').classList.add('hidden');
-                
                 const t = LANGUAGES[currentLang];
                 document.getElementById('prepTitle').innerText = t.ready;
                 document.getElementById('prepDesc').innerText = t.prep2;
@@ -372,7 +361,6 @@
         function updateTimerUI() {
             const t = LANGUAGES[currentLang];
             document.getElementById('waterGuideDisplay').innerText = `${selectedRamen.water}ml`;
-            
             const title = document.getElementById('phaseTitle');
             const desc = document.getElementById('phaseDesc');
             
@@ -387,9 +375,8 @@
             } else if (phase === 'finished') {
                 title.innerText = t.finish;
                 title.className = "text-2xl font-black mb-3 tracking-tight text-green-600";
-                desc.innerText = "Enjoy!";
+                desc.innerText = "YUMMY!";
             }
-            
             updateTimerDisplay();
             updateUIStrings();
         }
@@ -399,13 +386,12 @@
             const s = timeLeft % 60;
             const display = document.getElementById('timerDisplay');
             display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-            display.className = `text-7xl font-mono font-black my-8 tracking-tighter ${timerActive ? 'text-slate-900' : 'text-slate-200'} transition-colors`;
+            display.className = `text-7xl font-mono font-black my-6 tracking-tighter ${timerActive ? 'text-slate-900' : 'text-slate-200'} transition-colors`;
         }
 
         function togglePause() {
             timerActive = !timerActive;
-            const icon = document.getElementById('pauseIcon');
-            icon.className = timerActive ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+            document.getElementById('pauseIcon').className = timerActive ? 'fa-solid fa-pause' : 'fa-solid fa-play';
             updateUIStrings();
             updateTimerDisplay();
         }
@@ -420,10 +406,11 @@
             document.getElementById('prepArea').classList.remove('hidden');
             document.getElementById('activeTimerArea').classList.add('hidden');
             stopSpeakingUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Initialize on load
         window.onload = init;
     </script>
 </body>
 </html>
+
